@@ -1,2 +1,2 @@
-# SafeAI2020
-BNN Adversarial Example Tests for SafeAI2020
+# SafeAI2021
+BNN Adversarial Example Tests for SafeAI2021
