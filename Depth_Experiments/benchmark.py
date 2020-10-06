@@ -34,7 +34,7 @@ X_test = X_test/255.
 X_train = X_train.astype("float32").reshape(-1, 28*28)
 X_test = X_test.astype("float32").reshape(-1, 28* 28)
 
-num_images = 500
+num_images = 50
 ord = 1
 from tqdm import trange
 
@@ -44,6 +44,8 @@ elif(attack == "PGD"):
     meth = analyzers.PGD
 elif(attack == "CW"):
     meth = analyzers.CW
+elif(attack == 'GA'):
+    meth = analyzers.gen_attack
 
 results = []; acc = []
 for w in widths:
@@ -76,7 +78,10 @@ for w in widths:
     acc.append(float(res.numpy()))
     print("[%s] Accuracy: "%(w), res)
     accuracy = tf.keras.metrics.Accuracy()
-    adv = meth(model, X_test[0:num_images], eps=0.1, loss_fn=loss, 
+    if attack == 'GA':
+        adv = meth(model, X_test[0:num_images], 30, 0.5, 30, 0.1)
+    else:
+        adv = meth(model, X_test[0:num_images], eps=0.1, loss_fn=loss, 
                num_models=10, order=ord, direction=y_test[0:num_images])#, num_steps=15)
     preds = model.predict(adv)
     accuracy.update_state(np.argmax(preds, axis=1), y_test[0:num_images])

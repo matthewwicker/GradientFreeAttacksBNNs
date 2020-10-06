@@ -144,7 +144,7 @@ def gen_attack(model, inp, G, R, N, D, selection='t2', crossover='s2', mutation=
                     mutated_pop[i][p] *= -1
         return mutated_pop
 
-    true_classes = np.argmax(model.predict(inp, n=15))
+    true_classes = np.argmax(model.predict(inp, n=15), axis=1)
     pop = rng.choice([-D, D], size=(inp.shape[0], N, inp.shape[1]))
     # pop = rng.uniform(-D, D, size=(N, inp.shape[0]))
     copies = np.zeros((inp.shape[0], N, inp.shape[1]))
@@ -159,7 +159,7 @@ def gen_attack(model, inp, G, R, N, D, selection='t2', crossover='s2', mutation=
         # Compute fitness.
         clipped = np.asarray(np.clip(copies + pop, 0, 1))
         preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1])), n=15)).reshape((inp.shape[0], N, -1))
-        true_softmaxes = preds[:, :, true_classes]
+        true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
         f = -np.log(true_softmaxes)
 
         # Return the fittest member if it misclassifies.
