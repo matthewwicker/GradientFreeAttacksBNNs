@@ -21,6 +21,9 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--attack")
 parser.add_argument("--opt")
+parser.add_argument("--G", type=int)
+parser.add_argument("--R", type=float)
+parser.add_argument("--N", type=int)
 
 widths = ["1", "2", "3", "4", "5", "6"]
 
@@ -34,7 +37,7 @@ X_test = X_test/255.
 X_train = X_train.astype("float32").reshape(-1, 28*28)
 X_test = X_test.astype("float32").reshape(-1, 28* 28)
 
-num_images = 50
+num_images = 100
 ord = 1
 from tqdm import trange
 
@@ -79,7 +82,7 @@ for w in widths:
     print("[%s] Accuracy: "%(w), res)
     accuracy = tf.keras.metrics.Accuracy()
     if attack == 'GA':
-        adv = meth(model, X_test[0:num_images], 30, 0.5, 30, 0.1)
+        adv = meth(model, X_test[0:num_images], G=args.G, R=args.R, N=args.N, D=0.1)
     else:
         adv = meth(model, X_test[0:num_images], eps=0.1, loss_fn=loss, 
                num_models=10, order=ord, direction=y_test[0:num_images])#, num_steps=15)
