@@ -14,11 +14,13 @@ from tensorflow.keras.layers import *
 
 import numpy as np
 
-
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--attack")
 parser.add_argument("--opt")
+parser.add_argument("--G", type=int)
+parser.add_argument("--R", type=float)
+parser.add_argument("--N", type=int)
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
@@ -34,7 +36,7 @@ X_test = X_test/255.
 X_train = X_train.astype("float32").reshape(-1, 28*28)
 X_test = X_test.astype("float32").reshape(-1, 28* 28)
 
-num_images = 500
+num_images = 100
 ord = 1
 from tqdm import trange
 
@@ -44,6 +46,8 @@ elif(attack == "PGD"):
     meth = analyzers.PGD
 elif(attack == "CW"):
     meth = analyzers.CW
+elif(attack == 'GA'):
+    meth = analyzers.gen_attack
 
 results = []; acc = []; veri = []
 for w in widths:
@@ -76,8 +80,11 @@ for w in widths:
     acc.append(float(res.numpy()))
     print("[%s] Accuracy: "%(w), res)
     accuracy = tf.keras.metrics.Accuracy()
-    adv = meth(model, X_test[0:num_images], eps=0.075, loss_fn=loss, 
-               num_models=10, order=ord, direction=y_test[0:num_images])#, num_steps=15)
+    if attack == 'GA':
+        adv = meth(model, X_test[0:num_images], G=args.G, R=args.R, N=args.N, D=0.075)
+    else:
+        adv = meth(model, X_test[0:num_images], eps=0.075, loss_fn=loss, 
+                   num_models=10, order=ord, direction=y_test[0:num_images])#, num_steps=15)
     preds = model.predict(adv)
     accuracy.update_state(np.argmax(preds, axis=1), y_test[0:num_images])
     res = accuracy.result()
@@ -91,9 +98,9 @@ for w in widths:
     res = accuracy.result()
     veri.append(float(res.numpy()))
 
-print(acc)
-print(results)
-print(veri)
+print(np.around(acc, 2))
+print(np.around(results, 2))
+print(np.around(veri, 2))
 """
 latex_string_header = "\begin{table}[] \n \begin{tabular}{llllll|l} \n Inference Method & BBB & VOGN & NoisyAdam & SWAG & SWAG-FC & SGD \\ \hline"
 latex_format_line = "Attack Name      & %.3f   &  %.3f  &  %.3f   & %.3f   & %.3f   & %.3f   "%(tuple(results))
