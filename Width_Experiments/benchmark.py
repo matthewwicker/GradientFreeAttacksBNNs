@@ -22,7 +22,7 @@ parser.add_argument("--G", type=int)
 parser.add_argument("--R", type=float)
 parser.add_argument("--N", type=int)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1, 2'
 
 widths = ["128", "256", "512", "1024"]
 
