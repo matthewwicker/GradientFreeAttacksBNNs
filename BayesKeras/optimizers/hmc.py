@@ -42,7 +42,7 @@ class HamiltonianMonteCarlo(optimizer.Optimizer):
             print(type(self.posterior_mean[i]))
 
         self.preload = kwargs.get('preload', -1)
-        if(type(self.preload) != -1):
+        if(type(self.preload) != int):
             print("Preloaded posterior mean weights: %s"%(self.preload))
             self.posterior_mean = np.load(self.preload + "/mean.npy", allow_pickle=True)
             self.posterior_mean = list(self.posterior_mean)

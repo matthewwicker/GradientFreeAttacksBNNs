@@ -25,7 +25,8 @@ parser.add_argument("--G", type=int)
 parser.add_argument("--R", type=float)
 parser.add_argument("--N", type=int)
 
-widths = ["1", "2", "3", "4", "5", "6"]
+#widths = ["1", "2", "3", "4", "5", "6"]
+widths = ["1", "2", "3", "4", "5"]#, "6"]
 
 args = parser.parse_args()
 attack = str(args.attack)

@@ -16,9 +16,6 @@ from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
 
 
-#tf.debugging.set_log_device_placement(True)
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -26,12 +23,15 @@ parser.add_argument("--eps")
 parser.add_argument("--lam")
 parser.add_argument("--depth")
 parser.add_argument("--opt")
+parser.add_argument("--gpu", nargs='?', default='0,1,2,3,4,5')
 
 args = parser.parse_args()
 eps = float(args.eps)
 lam = float(args.lam)
 optim = str(args.opt)
 depth = int(args.depth)
+gpu = str(args.gpu)
+os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 rob = 0
 
 (X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
@@ -68,6 +68,10 @@ elif(optim == 'SGD'):
 elif(optim == 'NA'):
     learning_rate = 0.001; decay=0.0
     opt = optimizers.NoisyAdam()
+elif(optim == 'HMC'):
+#    learning_rate = 0.075; decay=0.0; inf=250; burn_in=3
+    learning_rate = 0.045; decay=0.0; inf=350; burn_in=5
+    opt = optimizers.HamiltonianMonteCarlo()
 
 # Compile the model to train with Bayesian inference
 if(rob == 0):
@@ -75,8 +79,13 @@ if(rob == 0):
 elif(rob != 0):
     loss = BayesKeras.optimizers.losses.robust_crossentropy_loss
 
-bayes_model = opt.compile(model, loss_fn=loss, epochs=15, learning_rate=learning_rate, full_covar=full_covar,
-                          decay=decay, robust_train=rob, inflate_prior=inf)
+#bayes_model = opt.compile(model, loss_fn=loss, epochs=15, learning_rate=learning_rate, full_covar=full_covar,
+#                          decay=decay, robust_train=rob, inflate_prior=inf)
+
+bayes_model = opt.compile(model, loss_fn=loss, epochs=30, learning_rate=learning_rate,
+                          batch_size=128, linear_schedule=True,
+                          decay=decay, robust_train=rob, inflate_prior=inf,
+                          burn_in=burn_in, steps=25, b_steps=20, epsilon=eps, rob_lam=lam)
 
 # Train the model on your data
 bayes_model.train(X_train, y_train, X_test, y_test)

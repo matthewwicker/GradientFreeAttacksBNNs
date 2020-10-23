@@ -52,6 +52,8 @@ class PosteriorModel():
             self.frequency = np.load(path_to_model + "/freq.npy", allow_pickle=True)
             self.frequency = self.frequency/np.sum(self.frequency)
             self.num_post_samps = len(self.frequency)
+            print("We detected %s posterior samples."%(self.num_post_samps))
+            print(self.frequency, len(self.frequency))
 
     def sample(self):
         """Returns a list of size 2x`n_layers` (a weight followed by a bias for each layer).
@@ -68,8 +70,13 @@ class PosteriorModel():
                 sampled_weights.append(np.random.normal(loc=self.posterior_mean[i],
                                                     scale=self.posterior_var[i]))
         elif(self.sample_based):
-            index = np.random.choice(range(self.num_post_samps), p=self.frequency)
-            sampled_weights = np.load(self.path_to_model+"/samples/sample_%s.npy"%(index), allow_pickle=True)
+            for i in range(3):
+                try:
+                    index = np.random.choice(range(self.num_post_samps), p=self.frequency)
+                    sampled_weights = np.load(self.path_to_model+"/samples/sample_%s.npy"%(index), allow_pickle=True)
+                    break
+                except:
+                    pass
         return sampled_weights
 
     def predict(self, input, n=35):

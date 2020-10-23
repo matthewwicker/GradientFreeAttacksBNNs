@@ -24,7 +24,7 @@ parser.add_argument("--N", type=int)
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1, 2'
 
-widths = ["128", "256", "512", "1024"]
+widths = ["128", "256", "512", "1024", "2048"]
 
 args = parser.parse_args()
 attack = str(args.attack)
