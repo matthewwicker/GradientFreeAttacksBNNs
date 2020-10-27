@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
 
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 import numpy as np
 
@@ -25,8 +25,8 @@ parser.add_argument("--G", type=int)
 parser.add_argument("--R", type=float)
 parser.add_argument("--N", type=int)
 
-#widths = ["1", "2", "3", "4", "5", "6"]
-widths = ["1", "2", "3", "4", "5"]#, "6"]
+widths = ["1", "2", "3", "4", "5", "6"]
+#widths = ["1", "2", "3", "4", "5"]#, "6"]
 
 args = parser.parse_args()
 attack = str(args.attack)
@@ -94,12 +94,13 @@ for w in widths:
     results.append(float(res.numpy()))
 print(acc)
 print(results)
-"""
-latex_string_header = "\begin{table}[] \n \begin{tabular}{llllll|l} \n Inference Method & BBB & VOGN & NoisyAdam & SWAG & SWAG-FC & SGD \\ \hline"
-latex_format_line = "Attack Name      & %.3f   &  %.3f  &  %.3f   & %.3f   & %.3f   & %.3f   "%(tuple(results))
-latex_string_footer = "\end{tabular} \n \end{table}"
 
-print_val = latex_string_header + latex_format_line + latex_string_footer
+latex_table_header = "\\begin{table}\n\\begin{tabular}{lllllll}\n"
+latex_title_line = "\t%s, %s\\\\\n" % (opt, attack)
+latex_acc_line = "\tAccuracy & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f \\\\\n\t\hline\n" % (tuple(acc))
+latex_rob_line = "\tRobustness & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f \\\\\n" % (tuple(results))
+latex_table_footer = "\end{tabular}\n\end{table}"
+
+print_val = latex_table_header + latex_title_line + latex_acc_line + latex_rob_line + latex_table_footer
 print(print_val)
-print(latex_format_line)
-"""
+
