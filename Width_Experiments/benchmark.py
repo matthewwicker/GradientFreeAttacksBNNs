@@ -18,11 +18,11 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--attack")
 parser.add_argument("--opt")
-parser.add_argument("--G", type=int)
-parser.add_argument("--R", type=float)
-parser.add_argument("--N", type=int)
+parser.add_argument("--G", type=int, nargs='?', const=-1)
+parser.add_argument("--R", type=float, nargs='?', const=-1)
+parser.add_argument("--N", type=int, nargs='?', const=-1)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1, 2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 widths = ["128", "256", "512", "1024", "2048"]
 

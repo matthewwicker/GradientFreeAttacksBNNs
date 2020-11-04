@@ -148,7 +148,7 @@ def _PGD(model, inp, loss_fn, eps, direc=-1, step=0.1, num_steps=15, num_models=
     for j in trange(num_steps):
         if(order == 1):
             grad = gradient_expectation(model, adv, direc, loss_fn, num_models)
-        elif(order == 1):
+        elif(order == 0):
             grad = zeroth_order_gradient(model, adv, direc, loss_fn, num_models)
         #grad = grad/np.max(grad, axis=1) #(grad-np.min(grad))/(np.max(grad)-np.min(grad))
         grad = np.sign(grad)
@@ -194,7 +194,7 @@ def CW(model, inp, loss_fn, eps=0.01, num_steps=5, num_models=25, direction=-1,
     for i in trange(num_steps, desc="CW iterations"):
         if(order == 1):
             grad = gradient_expectation(model, adv, direc, loss_fn, num_models)
-        elif(order == 1):
+        elif(order == 0):
             grad = zeroth_order_gradient(model, adv, direc, loss_fn, num_models)
         #grad = gradient_expectation(model, inp, direc, loss_fn, num_models)
         # Now we have a gradient approximation, lets finish the steps for an iteratio
@@ -218,6 +218,7 @@ def CW(model, inp, loss_fn, eps=0.01, num_steps=5, num_models=25, direction=-1,
         adv = adv + d
         #adv = np.clip(adv, 0, 1)
         adv = np.clip(adv, 0, 1)
+        adv = np.clip(adv, mini, maxi)
     adv = np.clip(adv, mini, maxi)
     adv = np.clip(adv, 0, 1)
     return adv

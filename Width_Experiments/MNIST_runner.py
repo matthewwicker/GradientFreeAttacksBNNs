@@ -82,7 +82,7 @@ elif(rob != 0):
 #bayes_model = opt.compile(model, loss_fn=loss, epochs=15, learning_rate=learning_rate, full_covar=full_covar,
 #                          decay=decay, robust_train=rob, inflate_prior=inf)
 
-bayes_model = opt.compile(model, loss_fn=loss, epochs=30, learning_rate=learning_rate,
+bayes_model = opt.compile(model, loss_fn=loss, epochs=200, learning_rate=learning_rate,
                           batch_size=128, linear_schedule=True,
                           decay=decay, robust_train=rob, inflate_prior=inf,
                           burn_in=burn_in, steps=25, b_steps=20, epsilon=eps, rob_lam=lam)
