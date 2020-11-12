@@ -73,13 +73,15 @@ def gen_attack(model, inp, G, R, N, D):
         for j in range(N):
             copies[i][j] += inp[i]
 
-    # compute initial fitness
+    # compute initial fitness and configure progress bar
     clipped = np.asarray(np.clip(copies + pop, 0, 1))
     preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1])), n=15)).reshape((inp.shape[0], N, -1))
     true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
     f = -np.log(true_softmaxes)
+    lowest_true_softmaxes = np.min(true_softmaxes, axis=1)
+    pbar = tqdm(range(G), desc='%d guaranteed misclasses' % np.sum(lowest_true_softmaxes < 0.1))
 
-    for g in tqdm(range(G)):
+    for g in pbar:
         
         # Do selection.
         parents = tournament2(f)
@@ -90,12 +92,14 @@ def gen_attack(model, inp, G, R, N, D):
         # Do mutation.
         new_pop = one_pixel(new_pop, R)
 
-        # update pop and fitness
+        # update pop and fitness and progress bar
         pop = new_pop
         clipped = np.asarray(np.clip(copies + pop, 0, 1))
         preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1])), n=15)).reshape((inp.shape[0], N, -1))
         true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
         f = -np.log(true_softmaxes)
+        lowest_true_softmaxes = np.min(true_softmaxes, axis=1)
+        pbar.set_description('%d guaranteed misclasses' % np.sum(lowest_true_softmaxes < 0.1))
 
     # return the best members of the population
     best = np.argmax(f, axis=1)
