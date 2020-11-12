@@ -22,15 +22,15 @@ parser.add_argument("--G", type=int, nargs='?', const=-1)
 parser.add_argument("--R", type=float, nargs='?', const=-1)
 parser.add_argument("--N", type=int, nargs='?', const=-1)
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1, 2'
 
-widths = ["128", "256", "512", "1024", "2048"]
+widths = ["32", "64", "128", "256", "512", "1024", "2048"]
 
 args = parser.parse_args()
 attack = str(args.attack)
 opt = str(args.opt)
 inference = opt
-(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+(X_train, y_train), (X_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
 X_train = X_train/255.
 X_test = X_test/255.
 X_train = X_train.astype("float32").reshape(-1, 28*28)
