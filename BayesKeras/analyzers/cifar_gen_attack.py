@@ -58,30 +58,27 @@ def one_pixel(new_pop, R):  # pretty good with R = 0.5
 # D: perturbation size
 def cifar_gen_attack(model, inp, G, R, N, D, selection='t2', crossover='s2', mutation='1p'):
 
-    true_classes = np.argmax(model.predict(inp, n=15), axis=1)
-    pop = rng.choice([-D, D], size=(inp.shape[0], N, inp.shape[1], inp.shape[2], inp.shape[3]))
-    # pop = rng.uniform(-D, D, size=(N, inp.shape[0]))
+    # load in population or make a new one if this is the beginning of a new run
+    try:
+        pop = np.load('pop_in_progress.npy')
+    except:
+        pop = rng.choice([-D, D], size=(inp.shape[0], N, inp.shape[1], inp.shape[2], inp.shape[3]))
+
+    # make copies of inputs to be used in the future
     copies = np.zeros((inp.shape[0], N, inp.shape[1], inp.shape[2], inp.shape[3]))
     for i in range(inp.shape[0]):
         for j in range(N):
             copies[i][j] += inp[i]
-    stagnation = 0
-    best_fitness_so_far = -1000
+
+    # compute initial fitness
+    clipped = np.asarray(np.clip(copies + pop, 0, 1))
+    preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1], inp.shape[2], inp.shape[3])), n=15)).reshape((inp.shape[0], N, -1))
+    true_classes = np.argmax(model.predict(inp, n=15), axis=1)
+    true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
+    f = -np.log(true_softmaxes)
 
     for g in tqdm(range(G)):
         
-        # Compute fitness.
-        clipped = np.asarray(np.clip(copies + pop, 0, 1))
-        preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1], inp.shape[2], inp.shape[3])), n=15)).reshape((inp.shape[0], N, -1))
-        true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
-        f = -np.log(true_softmaxes)
-
-        # Return the fittest member if it misclassifies.
-        best = np.argmax(f, axis=1)
-        # if np.argmax(preds[best]) != true_class:
-            # print('noice!')
-            # return inp + pop[best]
-
         # Do selection.
         if selection == 't2':
             parents = tournament2(f)
@@ -118,7 +115,17 @@ def cifar_gen_attack(model, inp, G, R, N, D, selection='t2', crossover='s2', mut
         else:
             return 'invalid mutation!'
 
+        # update pop and fitness
         pop = new_pop
+        clipped = np.asarray(np.clip(copies + pop, 0, 1))
+        preds = np.asarray(model.predict(clipped.reshape((-1, inp.shape[1], inp.shape[2], inp.shape[3])), n=15)).reshape((inp.shape[0], N, -1))
+        true_softmaxes = preds[range(inp.shape[0]), :, true_classes]
+        f = -np.log(true_softmaxes)
 
+        # save pop
+        np.save('pop_in_progress.npy', pop)
+
+    # return the best members of the population
+    best = np.argmax(f, axis=1)
     return np.clip(inp + pop[range(inp.shape[0]), best], 0, 1)
 
