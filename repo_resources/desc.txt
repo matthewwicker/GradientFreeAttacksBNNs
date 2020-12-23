@@ -1,0 +1,1 @@
+This is just a folder to put resources for the readme.md in the git repo.
