@@ -7,5 +7,6 @@ Reference Materials for further understanding this work:
 * Paper link: _to appear later_
 * Video presentation: _to appear later_
 
+Local draft of the paper can be found [here](https://www.google.com)
 
 
