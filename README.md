@@ -7,6 +7,10 @@ Reference Materials for further understanding this work:
 * Paper link: _to appear later_
 * Video presentation: _to appear later_
 
-Local draft of the paper can be found [here](https://www.google.com)
+Local draft of the paper can be found [here](https://github.com/matthewwicker/GradientFreeAttacksBNNs/blob/master/repo_resources/Draft-AABI.pdf)
 
+
+![alt text](https://github.com/matthewwicker/GradientFreeAttacksBNNs/blob/master/repo_resources/readmefig.png)
+
+Example Figure: Robust Accuracy on the MNIST dataset for each approximate Bayesian inference method against PGD, PGD with ZOO approximate gradients, PGD with BPDA approximate gradients, GA. We observe that in all cases GA outperforms other methods.
 
